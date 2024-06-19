@@ -27,7 +27,7 @@
 <body>
 
 <h1>Welcome to the Telegram Auth Demo</h1>
-<button id="login-button">Login with Telegram</button>
+<div id="login-button"></div>
 
 <div id="user-info">
     <h2>User Info</h2>
@@ -39,40 +39,54 @@
 
 <div id="log"></div>
 
-<script src="https://telegram.org/js/telegram-widget.js?7" async></script>
 <script>
-    document.getElementById('login-button').onclick = function () {
-	logEvent(`try..`);
-	if (typeof TelegramLogin != 'undefined'){
-		logEvent(`TelegramLogin is ${TelegramLogin}, ${TelegramLogin.requestAuth}`);
-	        TelegramLogin.requestAuth({bot_id: '6466414746:AAH4G4RnUa5cszP7ChpLJtHNkVE5F3M6GVM', lang: 'en'}, function onAuth(user) {
-	            // Display user info
-	            document.getElementById('user-info').style.display = 'block';
-	            document.getElementById('user-name').innerText = `Username: ${user.username}`;
-	            document.getElementById('user-id').innerText = `User ID: ${user.id}`;
-	            document.getElementById('user-photo-url').innerText = `Photo URL: ${user.photo_url}`;
-	            if (user.photo_url) {
-	                document.getElementById('user-photo').src = user.photo_url;
-	                document.getElementById('user-photo').style.display = 'block';
-	            }
+    function onTelegramAuth(user) {
+        // Display user info
+        document.getElementById('user-info').style.display = 'block';
+        document.getElementById('user-name').innerText = `Username: ${user.username}`;
+        document.getElementById('user-id').innerText = `User ID: ${user.id}`;
+        document.getElementById('user-photo-url').innerText = `Photo URL: ${user.photo_url}`;
+        if (user.photo_url) {
+            document.getElementById('user-photo').src = user.photo_url;
+            document.getElementById('user-photo').style.display = 'block';
+        }
 
-	            // Log the session
-	            logEvent(`User ${user.username} logged in.`);
-	        }, function onError(error) {
-	            logEvent(`Error: ${error}`);
-	        });
-	}
-	logEvent(`..over`);
-    };
+        // Log the session
+        logEvent(`User ${user.username} logged in.`);
+    }
 
     function logEvent(message) {
-	console.log(message);
         const logDiv = document.getElementById('log');
         const newLog = document.createElement('div');
         newLog.innerText = `Log: ${new Date().toLocaleTimeString()} - ${message}`;
         logDiv.appendChild(newLog);
         logDiv.scrollTop = logDiv.scrollHeight;
     }
+
+    // Replace 'YOUR_BOT_ID' with the actual Bot ID and 'YOUR_DOMAIN' with the actual domain (e.g., your website URL)
+    window.onload = function() {
+        const botId = 'YOUR_BOT_ID';
+        const domain = 'YOUR_DOMAIN';
+
+        const script = document.createElement('script');
+        script.src = `https://telegram.org/js/telegram-widget.js?19`;
+        script.setAttribute('data-telegram-login', botId);
+        script.setAttribute('data-size', 'large');
+        script.setAttribute('data-radius', '10');
+        script.setAttribute('data-request-access', 'write');
+        script.setAttribute('data-auth-url', `${domain}/auth`);
+        script.async = true;
+        document.getElementById('login-button').appendChild(script);
+
+        window.addEventListener('message', function(event) {
+            if (event.origin === `https://telegram.org`) {
+                const user = event.data;
+                if (user && user.query_id) {
+                    onTelegramAuth(user);
+                }
+            }
+        });
+    };
 </script>
 
 </body>
