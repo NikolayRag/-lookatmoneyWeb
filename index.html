@@ -1,43 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Auth Demo</title>
-
-  <script>
-    function handleTelegramAuth(user) {
-      if (user) {
-        document.getElementById('telegram-login').style.display = 'none';
-        document.getElementById('user-data').style.display = 'block';
-
-        document.getElementById('username').textContent = user.username;
-        document.getElementById('first_name').textContent = user.first_name;
-        document.getElementById('last_name').textContent = user.last_name;
-        document.getElementById('photo_url').src = user.photo_url;
-      } else {
-        alert('Authentication failed or cancelled by user.');
-      }
-    }
-
-    function telegramLoginWidget() {
-      window.TelegramLoginWidget = document.querySelector('#telegram-login');
-    }
-  </script>
-
+    <meta charset="UTF-8">
+    <title>Telegram Auth Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #log {
+            font-size: 14px;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+        #user-info {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Telegram Auth Demo</h1>
-  <div id="telegram-login" data-telegram-login="YOUR_BOT_NAME" data-size="large" data-auth-url="javascript:handleTelegramAuth()" data-request-access="write"></div>
-  <div id="user-data" style="display: none;">
+
+<h1>Welcome to the Telegram Auth Demo</h1>
+<button id="login-button">Login with Telegram</button>
+
+<div id="user-info">
     <h2>User Info</h2>
-    <p><strong>Username:</strong> <span id="username"></span></p>
-    <p><strong>First Name:</strong> <span id="first_name"></span></p>
-    <p><strong>Last Name:</strong> <span id="last_name"></span></p>
-    <p><strong>Photo:</strong> <img id="photo_url" alt="User Photo"></p>
-  </div>
+    <p id="user-name"></p>
+    <p id="user-id"></p>
+    <p id="user-photo-url"></p>
+    <img id="user-photo" src="" alt="User Photo" style="display: none;">
+</div>
 
+<div id="log"></div>
 
-  <script async src="https://telegram.org/js/telegram-widget.js?19" onload="telegramLoginWidget()"></script>
+<script src="https://telegram.org/js/telegram-widget.js?7" async></script>
+<script>
+    document.getElementById('login-button').onclick = function () {
+        TelegramLogin.requestAuth({bot_id: 'YOUR_BOT_ID', lang: 'en'}, function onAuth(user) {
+            // Display user info
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('user-name').innerText = `Username: ${user.username}`;
+            document.getElementById('user-id').innerText = `User ID: ${user.id}`;
+            document.getElementById('user-photo-url').innerText = `Photo URL: ${user.photo_url}`;
+            if (user.photo_url) {
+                document.getElementById('user-photo').src = user.photo_url;
+                document.getElementById('user-photo').style.display = 'block';
+            }
+
+            // Log the session
+            logEvent(`User ${user.username} logged in.`);
+        }, function onError(error) {
+            logEvent(`Error: ${error}`);
+        });
+    };
+
+    function logEvent(message) {
+        const logDiv = document.getElementById('log');
+        const newLog = document.createElement('div');
+        newLog.innerText = `Log: ${new Date().toLocaleTimeString()} - ${message}`;
+        logDiv.appendChild(newLog);
+        logDiv.scrollTop = logDiv.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
