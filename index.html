@@ -42,25 +42,31 @@
 <script src="https://telegram.org/js/telegram-widget.js?7" async></script>
 <script>
     document.getElementById('login-button').onclick = function () {
-        TelegramLogin.requestAuth({bot_id: 'YOUR_BOT_ID', lang: 'en'}, function onAuth(user) {
-            // Display user info
-            document.getElementById('user-info').style.display = 'block';
-            document.getElementById('user-name').innerText = `Username: ${user.username}`;
-            document.getElementById('user-id').innerText = `User ID: ${user.id}`;
-            document.getElementById('user-photo-url').innerText = `Photo URL: ${user.photo_url}`;
-            if (user.photo_url) {
-                document.getElementById('user-photo').src = user.photo_url;
-                document.getElementById('user-photo').style.display = 'block';
-            }
+	logEvent(`try..`);
+	if (typeof TelegramLogin != 'undefined'){
+		logEvent(`TelegramLogin is ${TelegramLogin}, ${TelegramLogin.requestAuth}`);
+	        TelegramLogin.requestAuth({bot_id: '6466414746:AAH4G4RnUa5cszP7ChpLJtHNkVE5F3M6GVM', lang: 'en'}, function onAuth(user) {
+	            // Display user info
+	            document.getElementById('user-info').style.display = 'block';
+	            document.getElementById('user-name').innerText = `Username: ${user.username}`;
+	            document.getElementById('user-id').innerText = `User ID: ${user.id}`;
+	            document.getElementById('user-photo-url').innerText = `Photo URL: ${user.photo_url}`;
+	            if (user.photo_url) {
+	                document.getElementById('user-photo').src = user.photo_url;
+	                document.getElementById('user-photo').style.display = 'block';
+	            }
 
-            // Log the session
-            logEvent(`User ${user.username} logged in.`);
-        }, function onError(error) {
-            logEvent(`Error: ${error}`);
-        });
+	            // Log the session
+	            logEvent(`User ${user.username} logged in.`);
+	        }, function onError(error) {
+	            logEvent(`Error: ${error}`);
+	        });
+	}
+	logEvent(`..over`);
     };
 
     function logEvent(message) {
+	console.log(message);
         const logDiv = document.getElementById('log');
         const newLog = document.createElement('div');
         newLog.innerText = `Log: ${new Date().toLocaleTimeString()} - ${message}`;
